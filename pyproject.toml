@@ -1,0 +1,78 @@
+[project]
+name = "looped-internals"
+version = "0.1.0"
+description = "Activation analysis and experiments for looped transformers"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Hugh Blayney", email = "hugh.blayney@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "circuitsvis>=1.43.3",
+    "dotenv>=0.9.9",
+    "ipykernel>=7.2.0",
+    "lm-eval>=0.4.13,<0.5",
+    "matplotlib>=3.7",
+    "parcae-lm",
+    "recurrent-pretraining",
+    "scikit-learn>=1.8.0",
+    "seaborn>=0.13.2",
+    "tiktoken>=0.12.0",
+    "torch>=2.0",
+    "tqdm>=4.0",
+    "transformer-lens==3.9.0",
+    "transformers==5.17.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+recurrent-pretraining = { git = "https://github.com/seal-rg/recurrent-pretraining.git" }
+# The PyPI parcae-lm 0.1.0 wheel ships no modules; build from the repository
+# subdirectory. This is the training fork, not upstream: the stability sweep's
+# configs carry injection_fixed_decay and max_recurrence, which upstream's
+# ParcaeConfig cannot construct.
+parcae-lm = { git = "https://github.com/HughBlayney/parcae-stability.git", subdirectory = "parcae_lm", rev = "5367e0f5253c66d507ddbb41c6260f23f2352457" }
+
+[dependency-groups]
+dev = ["pytest>=9.0.2", "ruff>=0.15.0", "ty>=0.0.18", "pre-commit>=4.0.0"]
+experiments = ["nbformat>=5.10", "papermill>=2.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "hf_pretrained: tests that load real pretrained HuggingFace checkpoints and may require network/cache/auth",
+]
+
+[tool.ruff]
+extend-exclude = ["experiments/runs", "experiments/results"]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "RUF"]
+ignore = [
+    "B008",   # function calls in default arguments (e.g. torch.dtype defaults)
+    "RUF002", # ambiguous unicode in docstrings (intentional math symbols: ×, –, σ)
+    "RUF003", # ambiguous unicode in comments (intentional math symbols)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"experiments/*.ipynb" = ["E402"]
+"tests/**" = [
+    "B",
+    "E402",
+] # tests use conditional imports and skip markers before imports
+"src/looped_internals/__init__.py" = [
+    "E402",
+    "RUF022",
+] # patches before imports; grouped __all__
+"src/looped_internals/analysis.py" = [
+    "RUF022",
+] # grouped __all__ by metric family
+
+[tool.ty.environment]
+python-version = "3.11"

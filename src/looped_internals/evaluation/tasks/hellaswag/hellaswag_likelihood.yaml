@@ -1,0 +1,20 @@
+tag:
+  - looped_internals_likelihood
+task: hellaswag_likelihood
+dataset_path: Rowan/hellaswag
+dataset_name: null
+output_type: loglikelihood
+num_fewshot: 0
+training_split: train
+validation_split: validation
+test_split: null
+process_docs: !function utils.process_docs
+doc_to_text: "{{query}}"
+# Match the leading space inserted by lm-eval's multiple-choice task.
+doc_to_target: " {{choices[gold]}}"
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 2.0

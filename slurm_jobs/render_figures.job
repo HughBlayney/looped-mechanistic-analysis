@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=paper-figures
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH --qos=medium
+#SBATCH --time=04:00:00
+#SBATCH --partition=normal
+#SBATCH --output=slurm_out/slurm-%x-%j.out
+
+set -euo pipefail
+cd "${SLURM_SUBMIT_DIR:?Submit from the repository root}"
+export MPLBACKEND=Agg
+export MPLCONFIGDIR="${TMPDIR:-/tmp}/looped-matplotlib-${SLURM_JOB_ID:-local}"
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
+export TOKENIZERS_PARALLELISM=false
+# Keep the original CUDA/bfloat16 request identity when reading GPU-produced
+# results. Require mode prevents model loading/inference; plotting uses the CPU.
+.venv/bin/python -m experiments.run_cached "$@" \
+    --datasets gsm8k hellaswag --device cuda --dtype bfloat16 --cache-mode require

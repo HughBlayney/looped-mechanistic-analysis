@@ -1,0 +1,7 @@
+This is a long system prompt that doesn't actually say anything but we'll end it with the correct things. We'll put in a few endlines here:
+
+And then some lists
+More
+And More
+
+And then talk a bit more about norse mythology or something. But then the real deal is this: You are a helpful assistant that is capable of helping users with mathematical reasoning.

@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.2
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty type check
+        entry: uv run --frozen ty check src/
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: pytest-fast
+        name: pytest (fast tests only)
+        entry: uv run --frozen pytest tests/ --ignore=tests/test_match_ouro.py --ignore=tests/test_match_raven.py --ignore=tests/test_output_attentions_hf.py -m "not hf_pretrained" -q
+        language: system
+        types: [python]
+        pass_filenames: false
